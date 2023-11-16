@@ -33,7 +33,6 @@ void MainWindow::clear_insert_inputs()
     this->ui->textEdit->clear();
     this->ui->lineEdit->clear();
     this->ui->lineEdit_2->clear();
-    this->ui->lineEdit_3->clear();
     this->ui->lineEdit_4->clear();
 }
 
@@ -45,12 +44,13 @@ void MainWindow::on_pushButton_clicked()
     widget_item->setText(0, NODE_TYPES[this->ui->comboBox->currentIndex()]);
     if (this->ui->comboBox->currentIndex() == 0) {
         widget_item->setText(1, this->ui->textEdit->toPlainText());
+    } else if (this->ui->comboBox->currentIndex() == 4) {
+        widget_item->setText(1, this->ui->comboBox_2->currentText());
     } else {
         const std::vector<QLineEdit*> input_widget_list = {
             this->ui->lineEdit,
             this->ui->lineEdit_4,
-            this->ui->lineEdit_2,
-            this->ui->lineEdit_3
+            this->ui->lineEdit_2
         };
         widget_item->setText(1, input_widget_list[this->ui->comboBox->currentIndex() - 1]->text());
     }
@@ -113,5 +113,11 @@ void MainWindow::on_toolButton_clicked()
 void MainWindow::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous)
 {
     this->ui->toolButton->setEnabled(true);
+}
+
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    this->ui->tabWidget->setCurrentIndex(2);
 }
 

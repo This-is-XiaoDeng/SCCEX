@@ -86,7 +86,7 @@ void Generator::generate_by_tree_items(std::vector<QTreeWidgetItem*> items)
             this->generate_by_tree_items(get_child_items(item));
             this->currect_indent_layer--;
        } else if (item_type == "结束") {
-            this->code += "yield event.Finish()";     // TODO 结局 ID
+            this->code += "yield event.Finish()";
             return;
        } else if (item_type == "消息") {
             this->code += "yield event.PushMsg(r'''" + item->text(1).toStdString() + "''',";

@@ -30,6 +30,8 @@ private slots:
 
     void on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
 
+    void on_pushButton_5_clicked();
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
