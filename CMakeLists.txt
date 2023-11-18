@@ -39,6 +39,7 @@ else()
         add_executable(SugarContChatEditor
             ${PROJECT_SOURCES}
             generator.h generator.cpp
+            endingdialog.h endingdialog.cpp endingdialog.ui
 
         )
     endif()

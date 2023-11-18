@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QTreeWidgetItem>
+#include <QTableWidgetItem>
 #include <vector>
 #include <QWidget>
 
@@ -32,10 +33,17 @@ private slots:
 
     void on_pushButton_5_clicked();
 
+    void on_pushButton_6_clicked();
+
+    void on_toolButton_2_clicked();
+
+    void on_tableWidget_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
     void on_treeWidget_changed();
+    void reload_ends();
 
 };
 

@@ -1,5 +1,6 @@
 #include "generator.h"
 #include <QTreeWidget>
+#include <QTableWidget>
 
 std::string generate_choice_list(std::vector<std::string> choices)
 {
@@ -14,12 +15,34 @@ std::string generate_choice_list(std::vector<std::string> choices)
     return choice_list + "]";
 }
 
-Generator::Generator(std::string name, std::string description)
+Generator::Generator(std::string name, std::string description, QTableWidget *ends)
 {
     this->code = "from .ContChat import *\n\n";
-    this->code += "@NewTestContChat(r'''" + name + "'''," + "r'''" + description  + "''')\n";
+    this->code += "@NewTestContChat(r'''" + name + "'''," + "r'''" + description  + "''', ends=" + get_ends_list(get_ends(ends)) + ")\n";
     this->code += "async def _(event: ContChatEvent):\n";
     this->currect_indent_layer = 1;
+}
+
+std::string get_ends_list(std::vector<EndWithStdString> ends)
+{
+    std::string ends_list = "[";
+    for (const auto &end : ends) {
+        ends_list += "End(r'''" + end.id + "''', r'''" + end.description + "'''), ";
+    }
+    ends_list += "]";
+    return ends_list;
+}
+
+std::vector<EndWithStdString> get_ends(QTableWidget *ends)
+{
+    std::vector<EndWithStdString> end_list;
+    for (int row=0; row < ends->rowCount(); row++) {
+        EndWithStdString end;
+        end.id = ends->item(row, 0)->text().toStdString();
+        end.description = ends->item(row, 1)->text().toStdString();
+        end_list.push_back(end);
+    }
+    return end_list;
 }
 
 void Generator::generate(QTreeWidget* tree_widget)
@@ -86,7 +109,11 @@ void Generator::generate_by_tree_items(std::vector<QTreeWidgetItem*> items)
             this->generate_by_tree_items(get_child_items(item));
             this->currect_indent_layer--;
        } else if (item_type == "结束") {
-            this->code += "yield event.Finish()";
+            this->code += "yield event.Finish(";
+            if (!item->text(1).isEmpty()) {
+                this->code += "r'''" + item->text(1).toStdString() + "'''";
+            }
+            this->code += ")";
             return;
        } else if (item_type == "消息") {
             this->code += "yield event.PushMsg(r'''" + item->text(1).toStdString() + "''',";

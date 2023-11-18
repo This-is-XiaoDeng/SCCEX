@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "./endingdialog.h"
 #include "./generator.h"
 #include "./ui_mainwindow.h"
 
@@ -18,9 +19,21 @@ void MainWindow::on_pushButton_4_clicked()
 {
     this->ui->lineEdit_5->clear();
     this->ui->textEdit_2->clear();
+    this->ui->tableWidget->clear();
     this->ui->treeWidget->clear();
     this->ui->textBrowser->clear();
+    this->ui->comboBox_2->clear();
     this->clear_insert_inputs();
+}
+
+void MainWindow::reload_ends()
+{
+    QStringList end_list;
+    for (int i = 0; i < this->ui->tableWidget->rowCount(); i++) {
+        end_list.push_back(this->ui->tableWidget->item(i, 0)->text());
+    }
+    this->ui->comboBox_2->clear();
+    this->ui->comboBox_2->addItems(end_list);
 }
 
 void MainWindow::on_comboBox_currentIndexChanged(int index)
@@ -78,7 +91,8 @@ void MainWindow::on_treeWidget_changed()
     this->clear_insert_inputs();
     Generator *generator = new Generator(
         this->ui->lineEdit_5->text().toStdString(),
-        this->ui->textEdit_2->toPlainText().toStdString()
+        this->ui->textEdit_2->toPlainText().toStdString(),
+        this->ui->tableWidget
     );
     generator->generate(this->ui->treeWidget);
     this->ui->textBrowser->setText(QString::fromStdString(generator->get_code()));
@@ -119,5 +133,40 @@ void MainWindow::on_treeWidget_currentItemChanged(QTreeWidgetItem *current, QTre
 void MainWindow::on_pushButton_5_clicked()
 {
     this->ui->tabWidget->setCurrentIndex(2);
+}
+
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    EndingDialog ending_dialog;
+    ending_dialog.show();
+    ending_dialog.exec();
+    End *end = ending_dialog.get_end();
+    if (end == nullptr) {
+        return;
+    }
+    int latest_row = this->ui->tableWidget->rowCount();
+    this->ui->tableWidget->setRowCount(latest_row + 1);
+    this->ui->tableWidget->setItem(latest_row, 0, new QTableWidgetItem(end->id));
+    this->ui->tableWidget->setItem(latest_row, 1, new QTableWidgetItem(end->description));
+    delete end;
+    this->reload_ends();
+}
+
+
+void MainWindow::on_toolButton_2_clicked()
+{
+    int current_row = this->ui->tableWidget->currentRow();
+    if (current_row == -1) {
+        this->ui->toolButton_2->setEnabled(false);
+        return;
+    }
+    this->ui->tableWidget->removeRow(current_row);
+}
+
+
+void MainWindow::on_tableWidget_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous)
+{
+    this->ui->toolButton_2->setEnabled(true);
 }
 
