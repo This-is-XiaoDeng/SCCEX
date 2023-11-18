@@ -35,3 +35,4 @@ jobs:
          ./build/Release/Qt6Core.dll
          ./build/Release/Qt6Gui.dll
          ./build/Release/Qt6Widgets.dll
+         ./build/Release/libEGL.dll
