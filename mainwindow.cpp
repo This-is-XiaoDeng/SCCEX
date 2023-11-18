@@ -73,7 +73,7 @@ void MainWindow::on_pushButton_clicked()
         this->on_treeWidget_changed();
         return;
     }
-    QTreeWidgetItem* selected_item = this->ui->treeWidget->selectedItems().toVector().toStdVector()[0];
+    QTreeWidgetItem* selected_item = this->ui->treeWidget->selectedItems()[0];
     if (this->ui->comboBox->currentIndex() == 1 || selected_item->text(0) == "选项" || selected_item->text(0) == "判定") {
         selected_item->addChild(widget_item);
         selected_item->setExpanded(true);
@@ -110,7 +110,7 @@ const std::vector<QString> NODE_TYPES = {
 
 void MainWindow::on_toolButton_clicked()
 {
-    QTreeWidgetItem* selected_item = this->ui->treeWidget->selectedItems().toVector().toStdVector()[0];
+    QTreeWidgetItem* selected_item = this->ui->treeWidget->selectedItems()[0];
     if (selected_item == nullptr) {
         this->ui->toolButton->setEnabled(false);
         return;
