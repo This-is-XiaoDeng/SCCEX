@@ -23,9 +23,15 @@ jobs:
        cd build
        cmake .. -DCMAKE_BUILD_TYPE=Release
        cmake --build . --config Release
+       cd Release
+       windeloyqt.exe "D:\a\build\Release\SugarContChatEditor.exe"
 
    - name: Archive production artifacts
      uses: actions/upload-artifact@v2
      with:
        name: SCCEX for Windows
-       path: ./build/Release/SugarContChatEditor.exe
+       path: |
+         ./build/Release/SugarContChatEditor.exe
+         ./build/Release/Qt6Core.dll
+         ./build/Release/Qt6Gui.dll
+         ./build/Release/Qt6Widgets.dll
