@@ -28,4 +28,4 @@ jobs:
      uses: actions/upload-artifact@v2
      with:
        name: SCCEX (Windows AMD64)
-       path: ./build/Release/SugarContChatEditorX.exe
+       path: ./build/Release/SugarContChatEditor.exe
