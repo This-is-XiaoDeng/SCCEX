@@ -24,7 +24,7 @@ jobs:
        cmake .. -DCMAKE_BUILD_TYPE=Release
        cmake --build . --config Release
        cd Release
-       windeloyqt.exe "D:\a\build\Release\SugarContChatEditor.exe"
+       windeployqt.exe "D:\a\build\Release\SugarContChatEditor.exe"
 
    - name: Archive production artifacts
      uses: actions/upload-artifact@v2
