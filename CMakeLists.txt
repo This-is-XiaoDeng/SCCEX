@@ -17,6 +17,11 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        generator.h
+        generator.cpp
+        endingdialog.h
+        endingdialog.cpp
+        endingdialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
