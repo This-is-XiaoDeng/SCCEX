@@ -1,7 +1,7 @@
 #include "mainwindow.h"
-#include "./endingdialog.h"
-#include "./generator.h"
-#include "./ui_mainwindow.h"
+#include "endingdialog.h"
+#include "generator.h"
+#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
