@@ -1,0 +1,31 @@
+name: Build and Upload
+
+on:
+ push:
+   branches: [master]
+
+jobs:
+ build:
+   runs-on: windows-latest
+
+   steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
+
+   - name: Install Qt
+     uses: jurplel/install-qt-action@v3
+     with:
+       version: '6.6.0'
+
+   - name: Build
+     run: |
+       mkdir build
+       cd build
+       cmake .. -DCMAKE_BUILD_TYPE=Release
+       cmake --build . --config Release
+
+   - name: Archive production artifacts
+     uses: actions/upload-artifact@v2
+     with:
+       name: SCCEX (Windows AMD64)
+       path: ./build/Release/SugarContChatEditorX.exe
