@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QFileDialog>
+#include <QMessageBox>
 #include "contchatfm.h"
 #include "endingdialog.h"
 #include "generator.h"
@@ -21,11 +22,21 @@ void MainWindow::on_pushButton_4_clicked()
 {
     this->ui->lineEdit_5->clear();
     this->ui->textEdit_2->clear();
-    this->ui->tableWidget->clear();
-    this->ui->treeWidget->clear();
+    // this->ui->tableWidget->clear();
+    // this->ui->treeWidget->clear();
     this->ui->textBrowser->clear();
     this->ui->comboBox_2->clear();
     this->clear_insert_inputs();
+
+    for (int i = 0; i < this->ui->tableWidget->rowCount(); ++i) {
+        for (int j = 0; j < this->ui->tableWidget->columnCount(); ++j) {
+            this->ui->tableWidget->setItem(i, j, nullptr);
+        }
+    }
+    while (this->ui->treeWidget->topLevelItemCount() > 0) {
+        QTreeWidgetItem *item = this->ui->treeWidget->takeTopLevelItem(0);
+        delete item;
+    }
 }
 
 void MainWindow::reload_ends()
@@ -175,7 +186,7 @@ void MainWindow::on_tableWidget_currentItemChanged(QTableWidgetItem *current, QT
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    QString file_path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Json Files (*.json);;All Files (*)");
+    QString file_path = QFileDialog::getSaveFileName(this, "保存项目 - SCCEX", QDir::homePath(), "Json Files (*.json);;All Files (*)");
     if (file_path.isNull()) {
         return;
     }
@@ -184,6 +195,45 @@ void MainWindow::on_pushButton_2_clicked()
     project.description = this->ui->textEdit_2->toPlainText().toStdString();
     project.ends = get_ends(this->ui->tableWidget);
     project.story_tree = this->ui->treeWidget;
-    save_project(project, file_path.toStdString());
+    while (!save_project(project, file_path.toStdString())) {
+        if (QMessageBox::critical(this, "错误 - SCCEX", "保存项目失败：打开文件时出现错误！") == QMessageBox::Cancel) {
+            break;
+        }
+    }
+}
+
+
+void MainWindow::on_pushButton_3_clicked()
+{
+    QString file_path = QFileDialog::getOpenFileName(this, "打开项目 - SCCEX", QDir::homePath(), "Json Files (*.json);;All Files (*)");
+    if (file_path.isNull()) {
+        return;
+    }
+    ContChatProjectWithVectorTree project;
+    while (true) {
+        project = load_project(file_path.toStdString());
+        if (project.is_success) {
+            break;
+        }
+        if (QMessageBox::critical(this, "错误 - SCCEX", "打开项目失败：打开文件时出现错误！") == QMessageBox::Cancel) {
+            return;
+        }
+    }
+    this->ui->pushButton_4->click();
+    this->ui->lineEdit_5->setText(QString::fromStdString(project.name));
+    this->ui->textEdit_2->setPlainText(QString::fromStdString(project.description));
+    int row=0;
+    for (const auto &end : project.ends) {
+        this->ui->tableWidget->setItem(++row, 0, new QTableWidgetItem(QString::fromStdString(end.id)));
+        this->ui->tableWidget->setItem(++row, 1, new QTableWidgetItem(QString::fromStdString(end.description)));
+    }
+    this->reload_ends();
+    for (const auto &item : project.story_tree) {
+        this->ui->treeWidget->addTopLevelItem(item);
+    }
+    this->on_treeWidget_changed();
+
+
+
 }
 

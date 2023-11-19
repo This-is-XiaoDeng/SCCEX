@@ -3,16 +3,15 @@
 
 
 
-void save_project(ContChatProject project, std::string path) {
+bool save_project(ContChatProject project, std::string path) {
     // std::cout << get_project_json(project) << std::endl;
     std::ofstream file(path);
     if (file.is_open()) {
         file << get_project_json(project);
         file.close();
-    } else {
-        std::cerr << "Error opening the file." << std::endl;
+        return true;
     }
-
+    return false;
 }
 
 std::string get_project_json(ContChatProject project)
@@ -62,4 +61,43 @@ Json::Value gengerate_story_tree(std::vector<QTreeWidgetItem*> tree_items)
     return tree;
 }
 
+ContChatProjectWithVectorTree load_project(std::string file_path){
+    std::ifstream file(file_path);
+    ContChatProjectWithVectorTree project;
+    project.is_success = true;
+    if (!file.is_open()) {
+        project.is_success = false;
+        return project;
+    }
+    Json::Reader reader;
+    Json::Value data;
+    if (!reader.parse(file, data)) {
+        project.is_success = false;
+        return project;
+    }
+    project.name = data["name"].asString();
+    project.description = data["description"].asString();
+    for (const auto &key : data["ends"].getMemberNames()) {
+        EndWithStdString end;
+        end.id = key;
+        end.description = data["ends"][key].asString();
+        project.ends.push_back(end);
+    }
+    project.story_tree = parse_story_tree(data["tree"]);
+    return project;
+}
 
+std::vector<QTreeWidgetItem*> parse_story_tree(Json::Value json_tree)
+{
+    std::vector<QTreeWidgetItem*> tree;
+    for (const Json::Value& item: json_tree) {
+        QTreeWidgetItem *widget_item = new QTreeWidgetItem();
+        widget_item->setText(0, QString::fromStdString(item["type"].asString()));
+        widget_item->setText(1, QString::fromStdString(item["content"].asString()));
+        for (const auto &child : parse_story_tree(item["children"])) {
+            widget_item->addChild(child);
+        }
+        tree.push_back(widget_item);
+    }
+    return tree;
+}
