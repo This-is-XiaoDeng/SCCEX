@@ -55,9 +55,9 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
 
-   - name: Init submodules
-     run: |
-       git submodule init
+    - name: Init submodules
+      run: |
+        git submodule init
 
     - name: Install Qt6
       uses: jurplel/install-qt-action@v3
