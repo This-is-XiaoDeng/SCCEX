@@ -39,6 +39,8 @@ private slots:
 
     void on_tableWidget_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();

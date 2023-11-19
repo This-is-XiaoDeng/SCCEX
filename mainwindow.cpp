@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include <QFileDialog>
+#include "contchatfm.h"
 #include "endingdialog.h"
 #include "generator.h"
 #include "ui_mainwindow.h"
@@ -168,5 +170,20 @@ void MainWindow::on_toolButton_2_clicked()
 void MainWindow::on_tableWidget_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous)
 {
     this->ui->toolButton_2->setEnabled(true);
+}
+
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QString file_path = QFileDialog::getSaveFileName(this, "Save File", QDir::homePath(), "Json Files (*.json);;All Files (*)");
+    if (file_path.isNull()) {
+        return;
+    }
+    ContChatProject project;
+    project.name = this->ui->lineEdit_5->text().toStdString();
+    project.description = this->ui->textEdit_2->toPlainText().toStdString();
+    project.ends = get_ends(this->ui->tableWidget);
+    project.story_tree = this->ui->treeWidget;
+    save_project(project, file_path.toStdString());
 }
 

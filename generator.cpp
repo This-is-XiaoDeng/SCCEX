@@ -27,7 +27,7 @@ std::string get_ends_list(std::vector<EndWithStdString> ends)
 {
     std::string ends_list = "[";
     for (const auto &end : ends) {
-        ends_list += "End(r'''" + end.id + "''', r'''" + end.description + "'''), ";
+        ends_list += "CcEnd(r'''" + end.id + "''', r'''" + end.description + "'''), ";
     }
     ends_list += "]";
     return ends_list;

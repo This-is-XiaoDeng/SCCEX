@@ -22,6 +22,9 @@ set(PROJECT_SOURCES
         endingdialog.h
         endingdialog.cpp
         endingdialog.ui
+        contchatfm.h
+        contchatfm.cpp
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -45,12 +48,20 @@ else()
             ${PROJECT_SOURCES}
             generator.h generator.cpp
             endingdialog.h endingdialog.cpp endingdialog.ui
+            contchatfm.h contchatfm.cpp
 
         )
     endif()
 endif()
 
 target_link_libraries(SugarContChatEditor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+# target_include_directories(SugarContChatEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+# target_include_directories(SugarContChatEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/json)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/include/jsoncpp)
+target_link_libraries(SugarContChatEditor PRIVATE jsoncpp_lib)
+
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
