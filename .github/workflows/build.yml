@@ -36,10 +36,10 @@ jobs:
      uses: actions/upload-artifact@v2
      with:
        name: SCCEX for Windows
-       path: |
-         ./build/Release/SugarContChatEditor.exe
-         ./build/Release/Qt6Core.dll
-         ./build/Release/Qt6Gui.dll
-         ./build/Release/Qt6Widgets.dll
-         ./build/Release/platforms/
-         ./build/Release/styles/
+       path: ./build/Release/**/*
+         # ./build/Release/SugarContChatEditor.exe
+         # ./build/Release/Qt6Core.dll
+         # ./build/Release/Qt6Gui.dll
+         # ./build/Release/Qt6Widgets.dll
+         # ./build/Release/platforms/
+         # ./build/Release/styles/
