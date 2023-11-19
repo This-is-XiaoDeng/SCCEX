@@ -31,15 +31,18 @@ jobs:
        cmake --build . --config Release
        cd Release
        windeployqt.exe "D:\a\SCCEX\SCCEX\build\Release\SugarContChatEditor.exe"
+       copy ../include/jsoncpp/src/lib_json/Release/jsoncpp.dll .
 
    - name: Archive production artifacts
      uses: actions/upload-artifact@v2
      with:
        name: SCCEX for Windows
-       path: ./build
-         # ./build/Release/SugarContChatEditor.exe
-         # ./build/Release/Qt6Core.dll
-         # ./build/Release/Qt6Gui.dll
-         # ./build/Release/Qt6Widgets.dll
-         # ./build/Release/platforms/
-         # ./build/Release/styles/
+       path: |
+         ./build/Release/SugarContChatEditor.exe
+         ./build/Release/Qt6Core.dll
+         ./build/Release/Qt6Gui.dll
+         ./build/Release/Qt6Widgets.dll
+         ./build/Release/platforms/
+         ./build/Release/styles/
+         ./build/Release/jsoncpp.dll
+         ./LICENSE
