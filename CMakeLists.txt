@@ -22,9 +22,8 @@ set(PROJECT_SOURCES
         endingdialog.h
         endingdialog.cpp
         endingdialog.ui
-        contchatfm.h
-        contchatfm.cpp
-
+        ccproject.h
+        ccproject.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -48,7 +47,8 @@ else()
             ${PROJECT_SOURCES}
             generator.h generator.cpp
             endingdialog.h endingdialog.cpp endingdialog.ui
-            contchatfm.h contchatfm.cpp
+            ccproject.h ccproject.cpp
+
 
         )
     endif()

@@ -16,6 +16,27 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>当前事件：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox_3"/>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_3">
+        <property name="text">
+         <string>+</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -32,43 +53,6 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <widget class="QPushButton" name="pushButton_2">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>保存</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_3">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="text">
-             <string>打开</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_4">
-            <property name="text">
-             <string>新建</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="1">
-         <widget class="QTextEdit" name="textEdit_2"/>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_5"/>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
@@ -83,10 +67,33 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEdit_5"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QTextEdit" name="textEdit_2"/>
+        </item>
         <item row="2" column="1">
          <widget class="QPushButton" name="pushButton_5">
           <property name="text">
            <string>点击编辑</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_10">
+          <property name="text">
+           <string>解锁条件：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>未开放</string>
           </property>
          </widget>
         </item>
@@ -120,7 +127,7 @@
            <item row="1" column="0" colspan="2">
             <widget class="QStackedWidget" name="stackedWidget">
              <property name="currentIndex">
-              <number>0</number>
+              <number>4</number>
              </property>
              <widget class="QWidget" name="page">
               <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -303,20 +310,84 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>代码</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QTextBrowser" name="textBrowser"/>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="action"/>
+    <addaction name="action_2"/>
+    <addaction name="action_3"/>
+    <addaction name="separator"/>
+    <addaction name="action_SCCEX_2"/>
+    <addaction name="action_10"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>事件</string>
+    </property>
+    <addaction name="action_6"/>
+    <addaction name="separator"/>
+    <addaction name="action_8"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>打开</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>保存</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>新建</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>测试</string>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="text">
+    <string>删除</string>
+   </property>
+  </action>
+  <action name="action_SCCEX">
+   <property name="text">
+    <string>关于 SCCEX</string>
+   </property>
+  </action>
+  <action name="action_SCCEX_2">
+   <property name="text">
+    <string>关于 SCCEX</string>
+   </property>
+  </action>
+  <action name="action_10">
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

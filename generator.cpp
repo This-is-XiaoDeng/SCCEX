@@ -23,7 +23,7 @@ Generator::Generator(std::string name, std::string description, QTableWidget *en
     this->currect_indent_layer = 1;
 }
 
-std::string get_ends_list(std::vector<EndWithStdString> ends)
+std::string get_ends_list(std::vector<End> ends)
 {
     std::string ends_list = "[";
     for (const auto &end : ends) {
@@ -33,11 +33,11 @@ std::string get_ends_list(std::vector<EndWithStdString> ends)
     return ends_list;
 }
 
-std::vector<EndWithStdString> get_ends(QTableWidget *ends)
+std::vector<End> get_ends(QTableWidget *ends)
 {
-    std::vector<EndWithStdString> end_list;
+    std::vector<End> end_list;
     for (int row=0; row < ends->rowCount(); row++) {
-        EndWithStdString end;
+        End end;
         end.id = ends->item(row, 0)->text().toStdString();
         end.description = ends->item(row, 1)->text().toStdString();
         end_list.push_back(end);

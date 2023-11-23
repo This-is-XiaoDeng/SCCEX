@@ -6,6 +6,7 @@
 #include <QTableWidgetItem>
 #include <vector>
 #include <QWidget>
+#include "ccproject.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,7 +21,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_4_clicked();
 
     void on_comboBox_currentIndexChanged(int index);
 
@@ -39,18 +39,44 @@ private slots:
 
     void on_tableWidget_currentItemChanged(QTableWidgetItem *current, QTableWidgetItem *previous);
 
-    void on_pushButton_2_clicked();
 
-    void on_pushButton_3_clicked();
+    void on_action_triggered();
+
+    void on_action_2_triggered();
+
+    void on_action_3_triggered();
+
+    void on_comboBox_3_currentIndexChanged(int index);
+
+    void on_toolButton_3_clicked();
+
+
+    void on_lineEdit_5_textChanged(const QString &arg1);
+
+
+    void on_action_8_triggered();
+
+    void on_action_SCCEX_2_triggered();
 
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
     void on_treeWidget_changed();
     void reload_ends();
+    void reload_project();
+    void reload_event_list();
+    void clear_treeWidget();
+    QTreeWidgetItem* get_tree_item(CcStoryNode node);
+    void update_currect_event();
+    void clear_tableWidget();
+    void update_editor();
+    int get_node_type(QString string_type);
 
+    CcProject project;
+    int currect_event;
 };
 
 extern const std::vector<QString> NODE_TYPES;
+std::vector<CcStoryNode> get_story_tree(std::vector<QTreeWidgetItem*> items);
 
 #endif // MAINWINDOW_H

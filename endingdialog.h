@@ -7,7 +7,7 @@ namespace Ui {
 class EndingDialog;
 }
 
-struct End {
+struct EndWithQString {
     QString id;
     QString description;
 };
@@ -18,7 +18,7 @@ class EndingDialog : public QDialog
 
 public:
     explicit EndingDialog(QWidget *parent = nullptr);
-    End *get_end();
+    EndWithQString *get_end();
     ~EndingDialog();
 
 private slots:

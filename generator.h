@@ -5,7 +5,7 @@
 #include <QTableWidget>
 #include <vector>
 
-struct EndWithStdString {
+struct End {
     std::string id;
     std::string description;
 };
@@ -27,7 +27,7 @@ private:
 std::string generate_choice_list(std::vector<std::string> choices);
 std::vector<QTreeWidgetItem*> get_child_items(QTreeWidgetItem *item);
 std::vector<std::string> get_message_choices(QTreeWidgetItem *item);
-std::vector<EndWithStdString> get_ends(QTableWidget *ends);
-std::string get_ends_list(std::vector<EndWithStdString> ends);
+std::vector<End> get_ends(QTableWidget *ends);
+std::string get_ends_list(std::vector<End> ends);
 
 #endif // GENERATOR_H

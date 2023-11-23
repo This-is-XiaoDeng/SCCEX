@@ -1,9 +1,7 @@
 #include "mainwindow.h"
 #include <QFileDialog>
 #include <QMessageBox>
-#include "contchatfm.h"
 #include "endingdialog.h"
-#include "generator.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -11,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->ui->tabWidget->setDisabled(true);
 }
 
 MainWindow::~MainWindow()
@@ -18,30 +17,56 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_4_clicked()
+void MainWindow::on_action_3_triggered()
 {
-    this->ui->lineEdit_5->clear();
-    this->ui->textEdit_2->clear();
-    // this->ui->tableWidget->clear();
-    // this->ui->treeWidget->clear();
-    this->ui->textBrowser->clear();
-    this->ui->comboBox_2->clear();
-    this->clear_insert_inputs();
+    this->project = CcProject();
+    this->reload_project();
+}
 
-    for (int i = 0; i < this->ui->tableWidget->rowCount(); ++i) {
-        for (int j = 0; j < this->ui->tableWidget->columnCount(); ++j) {
-            this->ui->tableWidget->setItem(i, j, nullptr);
-        }
+void MainWindow::reload_event_list()
+{
+    QStringList event_list;
+    for (const CcEvent &event : this->project.evnets) {
+        event_list.push_back(QString::fromStdString(event.name));
     }
-    while (this->ui->treeWidget->topLevelItemCount() > 0) {
-        QTreeWidgetItem *item = this->ui->treeWidget->takeTopLevelItem(0);
-        delete item;
+    this->ui->comboBox_3->clear();
+    this->ui->comboBox_3->addItems(event_list);
+}
+
+void MainWindow::reload_project()
+{
+    this->clear_insert_inputs();
+    this->ui->comboBox_3->clear();
+    this->ui->tabWidget->setDisabled(true);
+    this->clear_tableWidget();
+    this->clear_treeWidget();
+    this->reload_event_list();
+
+}
+
+
+void MainWindow::clear_tableWidget() {
+    int rowCount = this->ui->tableWidget->rowCount();
+
+    // 删除表格中的每一行
+    for (int i = 0; i < rowCount; ++i) {
+        this->ui->tableWidget->removeRow(0);
+    }
+}
+
+
+void MainWindow::clear_treeWidget()
+{
+    int topLevelItemCount = this->ui->treeWidget->topLevelItemCount();
+    for (int i=0;i<topLevelItemCount;i++) {
+        delete this->ui->treeWidget->takeTopLevelItem(0);
     }
 }
 
 void MainWindow::reload_ends()
 {
     QStringList end_list;
+    std::cout << this->ui->tableWidget->rowCount() << std::endl;
     for (int i = 0; i < this->ui->tableWidget->rowCount(); i++) {
         end_list.push_back(this->ui->tableWidget->item(i, 0)->text());
     }
@@ -61,8 +86,6 @@ void MainWindow::clear_insert_inputs()
     this->ui->lineEdit_2->clear();
     this->ui->lineEdit_4->clear();
 }
-
-
 
 void MainWindow::on_pushButton_clicked()
 {
@@ -102,14 +125,7 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_treeWidget_changed()
 {
     this->clear_insert_inputs();
-    Generator *generator = new Generator(
-        this->ui->lineEdit_5->text().toStdString(),
-        this->ui->textEdit_2->toPlainText().toStdString(),
-        this->ui->tableWidget
-    );
-    generator->generate(this->ui->treeWidget);
-    this->ui->textBrowser->setText(QString::fromStdString(generator->get_code()));
-    delete generator;
+    // 在此检查项目
 }
 
 const std::vector<QString> NODE_TYPES = {
@@ -154,7 +170,7 @@ void MainWindow::on_pushButton_6_clicked()
     EndingDialog ending_dialog;
     ending_dialog.show();
     ending_dialog.exec();
-    End *end = ending_dialog.get_end();
+    EndWithQString *end = ending_dialog.get_end();
     if (end == nullptr) {
         return;
     }
@@ -184,56 +200,188 @@ void MainWindow::on_tableWidget_currentItemChanged(QTableWidgetItem *current, QT
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_action_2_triggered()
 {
-    QString file_path = QFileDialog::getSaveFileName(this, "保存项目 - SCCEX", QDir::homePath(), "Json Files (*.json);;All Files (*)");
-    if (file_path.isNull()) {
-        return;
+    if (this->project.file.empty()) {
+        QString file_path = QFileDialog::getSaveFileName(this, "保存项目 - SCCEX", QDir::homePath(), "Json Files (*.json);;All Files (*)");
+        if (file_path.isNull()) {
+            return;
+        }
+        this->project.file = file_path.toStdString();
     }
-    ContChatProject project;
-    project.name = this->ui->lineEdit_5->text().toStdString();
-    project.description = this->ui->textEdit_2->toPlainText().toStdString();
-    project.ends = get_ends(this->ui->tableWidget);
-    project.story_tree = this->ui->treeWidget;
-    while (!save_project(project, file_path.toStdString())) {
-        if (QMessageBox::critical(this, "错误 - SCCEX", "保存项目失败：打开文件时出现错误！") == QMessageBox::Cancel) {
-            break;
+    OperationResult result = this->project.save_project();
+    if (!result.is_success) {
+        if (QMessageBox::critical(this, "错误 - SCCEX", QString::fromStdString(result.error)) == QMessageBox::Retry) {
+            return this->on_action_2_triggered();
         }
     }
 }
 
 
-void MainWindow::on_pushButton_3_clicked()
+void MainWindow::on_action_triggered()
 {
     QString file_path = QFileDialog::getOpenFileName(this, "打开项目 - SCCEX", QDir::homePath(), "Json Files (*.json);;All Files (*)");
     if (file_path.isNull()) {
         return;
     }
-    ContChatProjectWithVectorTree project;
-    while (true) {
-        project = load_project(file_path.toStdString());
-        if (project.is_success) {
-            break;
-        }
-        if (QMessageBox::critical(this, "错误 - SCCEX", "打开项目失败：打开文件时出现错误！") == QMessageBox::Cancel) {
-            return;
+    this->project = CcProject();
+    this->project.file = file_path.toStdString();
+    OperationResult result = this->project.load_project();
+    if (!result.is_success) {
+        if (QMessageBox::critical(this, "错误 - SCCEX", QString::fromStdString(result.error)) == QMessageBox::Retry) {
+            return this->on_action_triggered();
         }
     }
-    this->ui->pushButton_4->click();
-    this->ui->lineEdit_5->setText(QString::fromStdString(project.name));
-    this->ui->textEdit_2->setPlainText(QString::fromStdString(project.description));
+}
+
+void MainWindow::on_comboBox_3_currentIndexChanged(int index)
+{
+    if (this->currect_event > 0) {
+        this->update_currect_event();
+    }
+    if (index < 0) {
+        this->ui->tabWidget->setDisabled(true);
+        return;
+    }
+    this->currect_event = index;
+    this->update_editor();
+}
+
+void MainWindow::update_editor()
+{
+    CcEvent event = this->project.evnets[this->currect_event];
+    this->ui->lineEdit_5->setText(QString::fromStdString(event.name));
+    this->ui->textEdit_2->setPlainText(QString::fromStdString(event.description));
     int row=0;
-    for (const auto &end : project.ends) {
-        this->ui->tableWidget->setItem(++row, 0, new QTableWidgetItem(QString::fromStdString(end.id)));
-        this->ui->tableWidget->setItem(++row, 1, new QTableWidgetItem(QString::fromStdString(end.description)));
+    this->clear_tableWidget();
+    for (const End &end : event.ends) {
+        this->ui->tableWidget->insertRow(row);
+        this->ui->tableWidget->setItem(row, 0, new QTableWidgetItem(QString::fromStdString(end.id)));
+        this->ui->tableWidget->setItem(row, 1, new QTableWidgetItem(QString::fromStdString(end.description)));
+        row++;
+    }
+    this->clear_treeWidget();
+    for (const CcStoryNode &node : event.tree) {
+        this->ui->treeWidget->addTopLevelItem(this->get_tree_item(node));
     }
     this->reload_ends();
-    for (const auto &item : project.story_tree) {
-        this->ui->treeWidget->addTopLevelItem(item);
+    this->ui->tabWidget->setEnabled(true);
+}
+
+QTreeWidgetItem* MainWindow::get_tree_item(CcStoryNode node)
+{
+    QTreeWidgetItem *item = new QTreeWidgetItem(this->ui->treeWidget);
+    item->setText(0, NODE_TYPES[node.type]);
+    item->setText(1, QString::fromStdString(node.content));
+    for (const CcStoryNode &child : node.children) {
+        item->addChild(this->get_tree_item(child));
     }
-    this->on_treeWidget_changed();
+    return item;
+}
+
+#define event this->project.evnets[this->currect_event]
+void MainWindow::update_currect_event()
+{
+    event.name = this->ui->lineEdit_5->text().toStdString();
+    event.description = this->ui->textEdit_2->toPlainText().toStdString();
+    event.ends.clear();
+    for (int row=0; row<this->ui->tableWidget->rowCount(); row++) {
+        End end;
+        end.id = this->ui->tableWidget->item(row, 0)->text().toStdString();
+        end.description = this->ui->tableWidget->item(row, 1)->text().toStdString();
+        event.ends.push_back(end);
+    }
+    std::vector<QTreeWidgetItem*> top_level_items;
+    for (int i=0; i<this->ui->treeWidget->topLevelItemCount(); i++) {
+        top_level_items.push_back(this->ui->treeWidget->topLevelItem(i));
+    }
+    event.tree = get_story_tree(top_level_items);
+}
+#undef event
+
+int get_node_type(QString string_type)
+{
+    int i=0;
+    for (const QString &type : NODE_TYPES) {
+        if (type == string_type) {
+            return i;
+        }
+        i++;
+    }
+}
+
+std::vector<CcStoryNode> get_story_tree(std::vector<QTreeWidgetItem*> items)
+{
+    std::vector<CcStoryNode> nodes;
+    for (const auto &item : items) {
+        CcStoryNode node;
+        node.type = get_node_type(item->text(0));
+        node.content = item->text(1).toStdString();
+        std::vector<QTreeWidgetItem*> child_items;
+        for (int i=0; i<item->childCount(); i++) {
+            child_items.push_back(item->child(i));
+        }
+        node.children = get_story_tree(child_items);
+        nodes.push_back(node);
+    }
+    return nodes;
+}
+
+void MainWindow::on_toolButton_3_clicked()
+{
+    CcEvent event;
+    event.name = "<未命名事件>";
+    this->project.evnets.push_back(event);
+    this->reload_event_list();
+    this->ui->comboBox_3->setCurrentIndex(this->project.evnets.size() - 1);
+}
 
 
 
+void MainWindow::on_lineEdit_5_textChanged(const QString &arg1)
+{
+
+    this->project.evnets[this->currect_event].name = arg1.toStdString();
+    this->ui->comboBox_3->setItemText(this->currect_event, arg1);
+}
+
+
+
+void MainWindow::on_action_8_triggered()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(
+        this,
+        "删除确认 - SCCEX",
+        "确定要删除当前选中事件吗？",
+        QMessageBox::Yes|QMessageBox::No
+    );
+    if (reply == QMessageBox::Yes) {
+        int index_of_event = this->currect_event;
+        this->currect_event = -1;
+        std::vector<CcEvent> cached_events;
+        int s = this->project.evnets.size() - 1;
+        for (int i=0; i<(s-index_of_event); i++) {
+            cached_events.push_back(this->project.evnets.back());
+            this->project.evnets.pop_back();
+        }
+        this->project.evnets.pop_back();
+        for (const auto &item : cached_events) {
+            this->project.evnets.push_back(item);
+        }
+        this->reload_event_list();
+        this->ui->comboBox_3->setCurrentIndex(-1);
+
+    }
+}
+
+
+void MainWindow::on_action_SCCEX_2_triggered()
+{
+    QMessageBox::about(
+        this,
+        "关于 - SCCEX",
+        "Sugar ContChat Editor X\nBy This is XiaoDeng\n\nhttps://github.com/This-is-XiaoDeng/SCCEX\n"
+    );
 }
 

@@ -14,12 +14,12 @@ EndingDialog::~EndingDialog()
     delete ui;
 }
 
-End *EndingDialog::get_end()
+EndWithQString *EndingDialog::get_end()
 {
     if (!this->is_confirmed) {
         return nullptr;
     }
-    End *end = new End;
+    EndWithQString *end = new EndWithQString;
     end->id = this->ui->lineEdit->text();
     end->description = this->ui->textEdit->toPlainText();
     return end;
