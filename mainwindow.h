@@ -64,6 +64,8 @@ private slots:
 
     void on_treeWidget_itemChanged(QTreeWidgetItem *item, int column);
 
+    void on_tableWidget_itemChanged(QTableWidgetItem *item);
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
