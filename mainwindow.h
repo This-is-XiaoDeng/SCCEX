@@ -60,6 +60,10 @@ private slots:
 
     void on_action_4_triggered();
 
+    void on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column);
+
+    void on_treeWidget_itemChanged(QTreeWidgetItem *item, int column);
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
@@ -72,13 +76,17 @@ private:
     void update_currect_event();
     void clear_tableWidget();
     void update_editor();
-    int get_node_type(QString string_type);
+    bool is_end(QString end);
+    inline bool is_valid_tree_item_edit(QTreeWidgetItem *item, int column);
 
     CcProject project;
     int current_event;
+
+    QString tree_widget_original_text;
 };
 
 extern const std::vector<QString> NODE_TYPES;
+int get_node_type(QString string_type);
 std::vector<CcStoryNode> get_story_tree(std::vector<QTreeWidgetItem*> items);
 
 #endif // MAINWINDOW_H

@@ -391,3 +391,37 @@ void MainWindow::on_action_4_triggered()
     code_view_dialog.exec();
 }
 
+
+void MainWindow::on_treeWidget_itemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    if (!(item->flags() & Qt::ItemIsEditable)) {
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+    }
+    this->tree_widget_original_text = item->text(column);
+    this->ui->treeWidget->editItem(item, column);
+}
+
+bool MainWindow::is_end(QString end)
+{
+    for (int i=0; i<this->ui->comboBox_2->count(); i++) {
+        if (this->ui->comboBox_2->itemText(i) == end) {
+            return true;
+        }
+    }
+    return false;
+}
+
+inline bool MainWindow::is_valid_tree_item_edit(QTreeWidgetItem *item, int column)
+{
+    return (column == 0 && get_node_type(item->text(0)) == -1) ||
+           (column == 1 && item->text(0) == "结束" && !(this->is_end(item->text(1))));
+
+}
+
+void MainWindow::on_treeWidget_itemChanged(QTreeWidgetItem *item, int column)
+{
+    if (this->is_valid_tree_item_edit(item, column)) {
+        item->setText(column, this->tree_widget_original_text);
+    }
+}
+
