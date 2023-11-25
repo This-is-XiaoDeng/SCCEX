@@ -127,7 +127,7 @@
            <item row="1" column="0" colspan="2">
             <widget class="QStackedWidget" name="stackedWidget">
              <property name="currentIndex">
-              <number>4</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="page">
               <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -331,6 +331,8 @@
     <addaction name="action_2"/>
     <addaction name="action_3"/>
     <addaction name="separator"/>
+    <addaction name="action_4"/>
+    <addaction name="separator"/>
     <addaction name="action_SCCEX_2"/>
     <addaction name="action_10"/>
    </widget>
@@ -373,11 +375,6 @@
     <string>删除</string>
    </property>
   </action>
-  <action name="action_SCCEX">
-   <property name="text">
-    <string>关于 SCCEX</string>
-   </property>
-  </action>
   <action name="action_SCCEX_2">
    <property name="text">
     <string>关于 SCCEX</string>
@@ -386,6 +383,11 @@
   <action name="action_10">
    <property name="text">
     <string>退出</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>生成代码</string>
    </property>
   </action>
  </widget>

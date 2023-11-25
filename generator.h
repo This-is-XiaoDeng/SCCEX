@@ -1,33 +1,32 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
-#include <QTreeWidget>
 #include <iostream>
-#include <QTableWidget>
-#include <vector>
-
-struct End {
-    std::string id;
-    std::string description;
-};
+#include "ccproject.h"
 
 class Generator
 {
 public:
-    Generator(std::string name, std::string description, QTableWidget *ends);
-    void generate(QTreeWidget* tree_widget);
+    Generator(CcProject project);
+
     std::string get_code();
+
 private:
-    int currect_indent_layer;
+    unsigned int currect_indent_layer;
     std::string code;
 
-    void init_line();
-    void generate_by_tree_items(std::vector<QTreeWidgetItem*> items);
+    void new_line();
+    void generate_event(CcEvent event);
+    void generate_event_tree(std::vector<CcStoryNode> tree);
+    void generate_tree_node(CcStoryNode node, int prev_node_type);
+
+    void parse_message_node(CcStoryNode node);
+    void parse_choice_node(CcStoryNode node, bool use_elif);
+    void parse_if_node(CcStoryNode node, bool use_elif);
+    void parse_code_node(CcStoryNode node);
+    void parse_finish_node(CcStoryNode node);
 };
 
-std::string generate_choice_list(std::vector<std::string> choices);
-std::vector<QTreeWidgetItem*> get_child_items(QTreeWidgetItem *item);
-std::vector<std::string> get_message_choices(QTreeWidgetItem *item);
-std::vector<End> get_ends(QTableWidget *ends);
-std::string get_ends_list(std::vector<End> ends);
+std::string get_ends_string(CcEvent event);
+std::string get_message_choices(std::vector<CcStoryNode> nodes);
 
 #endif // GENERATOR_H

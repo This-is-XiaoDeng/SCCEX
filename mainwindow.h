@@ -58,6 +58,8 @@ private slots:
 
     void on_action_SCCEX_2_triggered();
 
+    void on_action_4_triggered();
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();

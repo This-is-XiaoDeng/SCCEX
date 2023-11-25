@@ -1,82 +1,12 @@
 #include "generator.h"
-#include <QTreeWidget>
-#include <QTableWidget>
+#include <fmt/format.h>
 
-std::string generate_choice_list(std::vector<std::string> choices)
+Generator::Generator(CcProject project)
 {
-    std::string choice_list = "[";
-    for (const auto &choice : choices)
-    {
-        choice_list += "r'''" + choice + "''', ";
+    this->code = "from .ContChat import *\n";
+    for (const CcEvent &event : project.events) {
+        this->generate_event(event);
     }
-    if (choice_list.back() == '[') {
-        return "";
-    }
-    return choice_list + "]";
-}
-
-Generator::Generator(std::string name, std::string description, QTableWidget *ends)
-{
-    this->code = "from .ContChat import *\n\n";
-    this->code += "@NewTestContChat(r'''" + name + "'''," + "r'''" + description  + "''', ends=" + get_ends_list(get_ends(ends)) + ")\n";
-    this->code += "async def _(event: ContChatEvent):\n";
-    this->currect_indent_layer = 1;
-}
-
-std::string get_ends_list(std::vector<End> ends)
-{
-    std::string ends_list = "[";
-    for (const auto &end : ends) {
-        ends_list += "CcEnd(r'''" + end.id + "''', r'''" + end.description + "'''), ";
-    }
-    ends_list += "]";
-    return ends_list;
-}
-
-std::vector<End> get_ends(QTableWidget *ends)
-{
-    std::vector<End> end_list;
-    for (int row=0; row < ends->rowCount(); row++) {
-        End end;
-        end.id = ends->item(row, 0)->text().toStdString();
-        end.description = ends->item(row, 1)->text().toStdString();
-        end_list.push_back(end);
-    }
-    return end_list;
-}
-
-void Generator::generate(QTreeWidget* tree_widget)
-{
-    std::vector<QTreeWidgetItem*> top_level_items = {};
-    for (int i = 0; i < tree_widget->topLevelItemCount(); i++)
-    {
-       top_level_items.push_back(tree_widget->topLevelItem(i));
-    }
-    this->generate_by_tree_items(top_level_items);
-}
-
-std::vector<QTreeWidgetItem*> get_child_items(QTreeWidgetItem *item)
-{
-    std::vector<QTreeWidgetItem*> child_items = {};
-    for (int i=0; i<item->childCount(); i++)
-    {
-        child_items.push_back(item->child(i));
-    }
-    return child_items;
-}
-
-
-std::vector<std::string> get_message_choices(QTreeWidgetItem *item)
-{
-    std::vector<std::string> choices = {};
-    for (const auto &chlid_item : get_child_items(item))
-    {
-        if (chlid_item->text(0).toStdString() == "选项")
-        {
-            choices.push_back(chlid_item->text(1).toStdString());
-        }
-    }
-    return choices;
 }
 
 std::string Generator::get_code()
@@ -84,53 +14,158 @@ std::string Generator::get_code()
     return this->code;
 }
 
-void Generator::generate_by_tree_items(std::vector<QTreeWidgetItem*> items)
+void Generator::new_line()
 {
-    bool use_elif = false;
-    for (const auto &item : items)
-    {
-       this->init_line();
-       const std::string item_type = item->text(0).toStdString();
-       if (item_type != "选项") {
-            use_elif = false;
-       }
-       if (item_type == "选项") {
-            this->code += std::string(use_elif? "elif":"if") + " event.choice == r'''";
-            this->code += item->text(1).toStdString() + "''':";
-            use_elif = true;
-            this->currect_indent_layer++;
-            this->generate_by_tree_items(get_child_items(item));
-            this->currect_indent_layer--;
-       } else if (item_type == "代码") {
-            this->code += item->text(1).toStdString();
-       } else if (item_type == "判定") {
-            this->code += "if " + item->text(1).toStdString() + ":";
-            this->currect_indent_layer++;
-            this->generate_by_tree_items(get_child_items(item));
-            this->currect_indent_layer--;
-       } else if (item_type == "结束") {
-            this->code += "yield event.Finish(";
-            if (!item->text(1).isEmpty()) {
-                this->code += "r'''" + item->text(1).toStdString() + "'''";
-            }
-            this->code += ")";
-            return;
-       } else if (item_type == "消息") {
-            this->code += "yield event.PushMsg(r'''" + item->text(1).toStdString() + "''',";
-            this->code += generate_choice_list(get_message_choices(item)) + ")";
-            this->generate_by_tree_items(get_child_items(item));
-       }
+    this->code.append("\n");
+    for (int i=0;i<this->currect_indent_layer;i++) {
+        this->code.append("    ");
+    }
+
+}
+
+void Generator::generate_event(CcEvent event)
+{
+    this->currect_indent_layer = 0;
+    this->new_line();
+    this->code.append(fmt::format(
+        "@NewTestContChat(r'''{}''', r'''{}''', ends=[{}])",
+        event.name,
+        event.description,
+        get_ends_string(event)
+    ));
+    this->new_line();
+    this->code.append("def _(event: ContChatEvent):");
+    this->currect_indent_layer++;
+    this->generate_event_tree(event.tree);
+}
+
+void Generator::generate_event_tree(std::vector<CcStoryNode> tree)
+{
+    int prev_node_type = -1;
+    for (const CcStoryNode &node : tree) {
+        this->generate_tree_node(node, prev_node_type);
+        prev_node_type = node.type;
     }
 }
 
-void Generator::init_line()
+#define MESSAGE  0
+#define CHOICE   1
+#define CODE     2
+#define IF       3
+#define FINISH   4
+
+void Generator::generate_tree_node(CcStoryNode node, int prev_node_type)
 {
-    if (this->code.back() != '\n')
-    {
-        this->code += "\n";
+    this->new_line();
+    switch (node.type) {
+    case MESSAGE:
+        this->parse_message_node(node);
+        break;
+    case CHOICE:
+        this->parse_choice_node(node, prev_node_type == CHOICE);
+        break;
+    case CODE:
+        this->parse_code_node(node);
+        break;
+    case IF:
+        this->parse_if_node(node, prev_node_type == IF);
+        break;
+    case FINISH:
+        this->parse_finish_node(node);
+        break;
     }
-    for (int i=0; i<this->currect_indent_layer; i++)
-    {
-        this->code += "    ";
+}
+
+
+std::string get_message_choices(std::vector<CcStoryNode> nodes)
+{
+    if (nodes.empty()) {
+        return "";
     }
+    std::string choices = "[";
+    for (const CcStoryNode &node : nodes) {
+        if (node.type != CHOICE) {
+            continue;
+        }
+        choices.append(fmt::format(
+            "r'''{}''',",
+            node.content
+        ));
+    }
+    choices.append("]");
+    return choices;
+}
+
+#undef MESSAGE
+#undef CHOICE
+#undef CODE
+#undef IF
+#undef FINISH
+
+void Generator::parse_message_node(CcStoryNode node)
+{
+    this->code.append(fmt::format(
+        "yield event.PushMsg(r'''{}'''{})",
+        node.content,
+        get_message_choices(node.children)
+    ));
+    this->generate_event_tree(node.children);
+}
+
+void Generator::parse_choice_node(CcStoryNode node, bool use_elif)
+{
+    this->code.append(fmt::format(
+        "{} event.choice == r'''{}''':",
+        use_elif ? "elif" : "if",
+        node.content
+    ));
+    this->currect_indent_layer++;
+    if (node.children.empty()) {
+        this->code.append(" pass");
+    } else {
+        this->generate_event_tree(node.children);
+    }
+    this->currect_indent_layer--;
+}
+
+void Generator::parse_code_node(CcStoryNode node)
+{
+    this->code.append(node.content);
+}
+
+void Generator::parse_if_node(CcStoryNode node, bool use_elif)
+{
+    this->code.append(fmt::format(
+        "{} {}:",
+        use_elif ? "elif" : "if",
+        node.content
+        ));
+    this->currect_indent_layer++;
+    if (node.children.empty()) {
+        this->code.append(" pass");
+    } else {
+        this->generate_event_tree(node.children);
+    }
+    this->currect_indent_layer--;
+}
+
+void Generator::parse_finish_node(CcStoryNode node)
+{
+    this->code.append(fmt::format(
+        "yield event.Finish({})",
+        node.content.empty() ? "" : fmt::format("r'''{}'''", node.content)
+    ));
+}
+
+std::string get_ends_string(CcEvent event)
+{
+    std::string ends_string;
+    for (const End &end : event.ends) {
+        ends_string.append(fmt::format(
+            "CcEnd(r'''{}''', r'''{}''')",
+            end.id,
+            end.description
+        ));
+    }
+    return ends_string;
 }

@@ -2,6 +2,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "endingdialog.h"
+#include <fmt/printf.h>
+#include "generator.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -25,12 +27,10 @@ void MainWindow::on_action_3_triggered()
 
 void MainWindow::reload_event_list()
 {
-    QStringList event_list;
-    for (const CcEvent &event : this->project.evnets) {
-        event_list.push_back(QString::fromStdString(event.name));
-    }
     this->ui->comboBox_3->clear();
-    this->ui->comboBox_3->addItems(event_list);
+    for (const CcEvent &event : this->project.events) {
+        this->ui->comboBox_3->addItem(QString::fromStdString(event.name));
+    }
 }
 
 void MainWindow::reload_project()
@@ -41,14 +41,11 @@ void MainWindow::reload_project()
     this->clear_tableWidget();
     this->clear_treeWidget();
     this->reload_event_list();
-
 }
 
 
 void MainWindow::clear_tableWidget() {
     int rowCount = this->ui->tableWidget->rowCount();
-
-    // 删除表格中的每一行
     for (int i = 0; i < rowCount; ++i) {
         this->ui->tableWidget->removeRow(0);
     }
@@ -139,11 +136,11 @@ const std::vector<QString> NODE_TYPES = {
 
 void MainWindow::on_toolButton_clicked()
 {
-    QTreeWidgetItem* selected_item = this->ui->treeWidget->selectedItems()[0];
-    if (selected_item == nullptr) {
+    if (this->ui->treeWidget->selectedItems().isEmpty()) {
         this->ui->toolButton->setEnabled(false);
         return;
     }
+    QTreeWidgetItem* selected_item = this->ui->treeWidget->selectedItems()[0];
     if (selected_item->parent() == nullptr) {
         this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(selected_item));
     } else {
@@ -232,11 +229,13 @@ void MainWindow::on_action_triggered()
             return this->on_action_triggered();
         }
     }
+    this->reload_event_list();
+    this->ui->comboBox_3->setCurrentIndex(-1);
 }
 
 void MainWindow::on_comboBox_3_currentIndexChanged(int index)
 {
-    if (this->currect_event > 0) {
+    if (this->currect_event >= 0) {
         this->update_currect_event();
     }
     if (index < 0) {
@@ -249,7 +248,7 @@ void MainWindow::on_comboBox_3_currentIndexChanged(int index)
 
 void MainWindow::update_editor()
 {
-    CcEvent event = this->project.evnets[this->currect_event];
+    CcEvent event = this->project.events[this->currect_event];
     this->ui->lineEdit_5->setText(QString::fromStdString(event.name));
     this->ui->textEdit_2->setPlainText(QString::fromStdString(event.description));
     int row=0;
@@ -270,7 +269,7 @@ void MainWindow::update_editor()
 
 QTreeWidgetItem* MainWindow::get_tree_item(CcStoryNode node)
 {
-    QTreeWidgetItem *item = new QTreeWidgetItem(this->ui->treeWidget);
+    QTreeWidgetItem *item = new QTreeWidgetItem();
     item->setText(0, NODE_TYPES[node.type]);
     item->setText(1, QString::fromStdString(node.content));
     for (const CcStoryNode &child : node.children) {
@@ -279,9 +278,10 @@ QTreeWidgetItem* MainWindow::get_tree_item(CcStoryNode node)
     return item;
 }
 
-#define event this->project.evnets[this->currect_event]
+// #define event (this->project.events[this->currect_event])
 void MainWindow::update_currect_event()
 {
+    CcEvent& event = this->project.events[this->currect_event];
     event.name = this->ui->lineEdit_5->text().toStdString();
     event.description = this->ui->textEdit_2->toPlainText().toStdString();
     event.ends.clear();
@@ -296,8 +296,9 @@ void MainWindow::update_currect_event()
         top_level_items.push_back(this->ui->treeWidget->topLevelItem(i));
     }
     event.tree = get_story_tree(top_level_items);
+    // std::cout << "Event:" << event.description << " | " << this->ui->textEdit_2->toPlainText().toStdString() << std::endl;
 }
-#undef event
+// #undef event
 
 int get_node_type(QString string_type)
 {
@@ -308,6 +309,7 @@ int get_node_type(QString string_type)
         }
         i++;
     }
+    return -1;
 }
 
 std::vector<CcStoryNode> get_story_tree(std::vector<QTreeWidgetItem*> items)
@@ -331,21 +333,17 @@ void MainWindow::on_toolButton_3_clicked()
 {
     CcEvent event;
     event.name = "<未命名事件>";
-    this->project.evnets.push_back(event);
+    this->project.events.push_back(event);
     this->reload_event_list();
-    this->ui->comboBox_3->setCurrentIndex(this->project.evnets.size() - 1);
+    this->ui->comboBox_3->setCurrentIndex(this->project.events.size() - 1);
 }
-
-
 
 void MainWindow::on_lineEdit_5_textChanged(const QString &arg1)
 {
 
-    this->project.evnets[this->currect_event].name = arg1.toStdString();
+    this->project.events[this->currect_event].name = arg1.toStdString();
     this->ui->comboBox_3->setItemText(this->currect_event, arg1);
 }
-
-
 
 void MainWindow::on_action_8_triggered()
 {
@@ -360,21 +358,20 @@ void MainWindow::on_action_8_triggered()
         int index_of_event = this->currect_event;
         this->currect_event = -1;
         std::vector<CcEvent> cached_events;
-        int s = this->project.evnets.size() - 1;
+        int s = this->project.events.size() - 1;
         for (int i=0; i<(s-index_of_event); i++) {
-            cached_events.push_back(this->project.evnets.back());
-            this->project.evnets.pop_back();
+            cached_events.push_back(this->project.events.back());
+            this->project.events.pop_back();
         }
-        this->project.evnets.pop_back();
+        this->project.events.pop_back();
         for (const auto &item : cached_events) {
-            this->project.evnets.push_back(item);
+            this->project.events.push_back(item);
         }
         this->reload_event_list();
         this->ui->comboBox_3->setCurrentIndex(-1);
 
     }
 }
-
 
 void MainWindow::on_action_SCCEX_2_triggered()
 {
@@ -383,5 +380,13 @@ void MainWindow::on_action_SCCEX_2_triggered()
         "关于 - SCCEX",
         "Sugar ContChat Editor X\nBy This is XiaoDeng\n\nhttps://github.com/This-is-XiaoDeng/SCCEX\n"
     );
+}
+
+
+void MainWindow::on_action_4_triggered()
+{
+    this->update_currect_event();
+    Generator generator(this->project);
+    std::cout << generator.get_code() << std::endl;
 }
 

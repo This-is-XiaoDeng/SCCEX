@@ -3,13 +3,19 @@
 
 #include <iostream>
 #include <vector>
-#include "generator.h"
+
 #include <json/json.h>
 
 struct CcStoryNode {
     int type;
     std::string content;
     std::vector<CcStoryNode> children;
+};
+
+
+struct End {
+    std::string id;
+    std::string description;
 };
 
 struct CcEvent {
@@ -33,7 +39,7 @@ public:
     OperationResult save_project();
 
     std::string file;
-    std::vector<CcEvent> evnets;
+    std::vector<CcEvent> events;
 
 private:
     OperationResult get_events(Json::Value root);

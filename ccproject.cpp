@@ -82,12 +82,12 @@ std::vector<CcStoryNode> get_evnet_tree(Json::Value json_tree)
 OperationResult CcProject::get_events(Json::Value root)
 {
     OperationResult result;
-    if (!root["events"].isArray()) {
+    if (!root.isArray()) {
         result.is_success = false;
-        result.error = "Events 字段类型不正确（应为 Array）";
+        result.error = "类型不正确（应为 Array）";
         return result;
     }
-    for (const Json::Value &event : root["events"]) {
+    for (const Json::Value &event : root) {
         CcEvent ccevent;
         if (!check_event_keys(event)) {
             continue;
@@ -96,7 +96,7 @@ OperationResult CcProject::get_events(Json::Value root)
         ccevent.description = event["description"].asString();
         ccevent.ends = get_event_ends(event["ends"]);
         ccevent.tree = get_evnet_tree(event["tree"]);
-        this->evnets.push_back(ccevent);
+        this->events.push_back(ccevent);
     }
     result.is_success = true;
     return result;
@@ -144,7 +144,7 @@ Json::Value get_json_tree(std::vector<CcStoryNode> nodes)
 Json::Value CcProject::parse_events2json()
 {
     Json::Value events(Json::arrayValue);
-    for (const CcEvent event : this->evnets) {
+    for (const CcEvent event : this->events) {
         Json::Value json_event;
         json_event["name"] = event.name;
         json_event["description"] = event.description;

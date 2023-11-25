@@ -48,8 +48,6 @@ else()
             generator.h generator.cpp
             endingdialog.h endingdialog.cpp endingdialog.ui
             ccproject.h ccproject.cpp
-
-
         )
     endif()
 endif()
@@ -60,6 +58,9 @@ target_link_libraries(SugarContChatEditor PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
 # target_include_directories(SugarContChatEditor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/json)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/include/jsoncpp)
 target_link_libraries(SugarContChatEditor PRIVATE jsoncpp_lib)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/include/fmt)
+target_link_libraries(SugarContChatEditor PRIVATE fmt::fmt)
 
 
 

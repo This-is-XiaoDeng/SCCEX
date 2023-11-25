@@ -1,3 +1,6 @@
 [submodule "include/jsoncpp"]
 	path = include/jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "include/fmt"]
+	path = include/fmt
+	url = https://github.com/fmtlib/fmt
