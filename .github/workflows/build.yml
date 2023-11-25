@@ -32,6 +32,7 @@ jobs:
        cd Release
        windeployqt.exe "D:\a\SCCEX\SCCEX\build\Release\SugarContChatEditor.exe"
        copy ../include/jsoncpp/src/lib_json/Release/jsoncpp.dll .
+       copy ../include/fmt/libfmtd.dll .
        copy ../../LICENSE .
 
    - name: Archive production artifacts
@@ -46,4 +47,5 @@ jobs:
          ./build/Release/platforms/
          ./build/Release/styles/
          ./build/Release/jsoncpp.dll
+         ./build/Release/libfmtd.dll
          ./build/Release/LICENSE
