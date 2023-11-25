@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QTimer>
 #include <QMainWindow>
 #include <QTreeWidgetItem>
 #include <QTableWidgetItem>
@@ -69,7 +70,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
-    void on_treeWidget_changed();
+    inline void on_treeWidget_changed();
     void reload_ends();
     void reload_project();
     void reload_event_list();
@@ -80,10 +81,13 @@ private:
     void update_editor();
     bool is_end(QString end);
     inline bool is_valid_tree_item_edit(QTreeWidgetItem *item, int column);
+    void _check_current_event(QTreeWidgetItem *item);
+    void check_current_event();
+    inline bool is_valid_node(QTreeWidgetItem *item);
 
     CcProject project;
     int current_event;
-
+    QTimer *project_checking_timer;
     QString tree_widget_original_text;
 };
 

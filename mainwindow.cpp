@@ -13,6 +13,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->ui->tabWidget->setDisabled(true);
+    this->project_checking_timer = new QTimer(this);
+    this->project_checking_timer->setInterval(3000);
+    QObject::connect(this->project_checking_timer, &QTimer::timeout, this, &MainWindow::check_current_event);
+    this->project_checking_timer->start();
 }
 
 MainWindow::~MainWindow()
@@ -117,10 +121,9 @@ void MainWindow::on_pushButton_clicked()
     this->on_treeWidget_changed();
 }
 
-void MainWindow::on_treeWidget_changed()
+inline void MainWindow::on_treeWidget_changed()
 {
     this->clear_insert_inputs();
-    // 在此检查项目
 }
 
 const std::vector<QString> NODE_TYPES = {
@@ -131,6 +134,35 @@ const std::vector<QString> NODE_TYPES = {
     "结束"
 };
 
+inline bool MainWindow::is_valid_node(QTreeWidgetItem *item)
+{
+    const int node_type = get_node_type(item->text(0));
+    return (node_type == 1 && (item->parent() == nullptr || get_node_type(item->parent()->text(0)) != 0)) ||
+           (node_type == 4 && (this->is_end(item->text(1))));
+}
+
+void MainWindow::_check_current_event(QTreeWidgetItem *item)
+{
+    static QBrush default_color = item->foreground(0);
+    const QBrush red(Qt::red);
+    if (this->is_valid_node(item)) {
+        item->setForeground(0, red);
+        item->setForeground(1, red);
+    } else if (item->foreground(0) == red) {
+        item->setForeground(0, default_color);
+        item->setForeground(1, default_color);
+    }
+    for (int i=0; i<item->childCount(); i++) {
+        this->_check_current_event(item->child(i));
+    }
+}
+
+void MainWindow::check_current_event()
+{
+    for (int i=0; i<this->ui->treeWidget->topLevelItemCount(); i++) {
+        this->_check_current_event(this->ui->treeWidget->topLevelItem(i));
+    }
+}
 
 void MainWindow::on_toolButton_clicked()
 {
@@ -428,6 +460,10 @@ void MainWindow::on_treeWidget_itemChanged(QTreeWidgetItem *item, int column)
 
 void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
 {
-    this->reload_ends();
+    if (item->column() == 0) {
+        this->reload_ends();
+    }
 }
+
+
 
