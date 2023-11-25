@@ -425,3 +425,9 @@ void MainWindow::on_treeWidget_itemChanged(QTreeWidgetItem *item, int column)
     }
 }
 
+
+void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
+{
+    this->reload_ends();
+}
+
