@@ -2,6 +2,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "endingdialog.h"
+#include "codeviewdialog.h"
 #include <fmt/printf.h>
 #include "generator.h"
 #include "ui_mainwindow.h"
@@ -62,13 +63,10 @@ void MainWindow::clear_treeWidget()
 
 void MainWindow::reload_ends()
 {
-    QStringList end_list;
-    std::cout << this->ui->tableWidget->rowCount() << std::endl;
-    for (int i = 0; i < this->ui->tableWidget->rowCount(); i++) {
-        end_list.push_back(this->ui->tableWidget->item(i, 0)->text());
-    }
     this->ui->comboBox_2->clear();
-    this->ui->comboBox_2->addItems(end_list);
+    for (int i = 0; i < this->ui->tableWidget->rowCount(); i++) {
+        this->ui->comboBox_2->addItem(this->ui->tableWidget->item(i, 0)->text());
+    }
 }
 
 void MainWindow::on_comboBox_currentIndexChanged(int index)
@@ -235,20 +233,20 @@ void MainWindow::on_action_triggered()
 
 void MainWindow::on_comboBox_3_currentIndexChanged(int index)
 {
-    if (this->currect_event >= 0) {
+    if (this->current_event >= 0) {
         this->update_currect_event();
     }
     if (index < 0) {
         this->ui->tabWidget->setDisabled(true);
         return;
     }
-    this->currect_event = index;
+    this->current_event = index;
     this->update_editor();
 }
 
 void MainWindow::update_editor()
 {
-    CcEvent event = this->project.events[this->currect_event];
+    CcEvent event = this->project.events[this->current_event];
     this->ui->lineEdit_5->setText(QString::fromStdString(event.name));
     this->ui->textEdit_2->setPlainText(QString::fromStdString(event.description));
     int row=0;
@@ -281,7 +279,7 @@ QTreeWidgetItem* MainWindow::get_tree_item(CcStoryNode node)
 // #define event (this->project.events[this->currect_event])
 void MainWindow::update_currect_event()
 {
-    CcEvent& event = this->project.events[this->currect_event];
+    CcEvent& event = this->project.events[this->current_event];
     event.name = this->ui->lineEdit_5->text().toStdString();
     event.description = this->ui->textEdit_2->toPlainText().toStdString();
     event.ends.clear();
@@ -341,8 +339,8 @@ void MainWindow::on_toolButton_3_clicked()
 void MainWindow::on_lineEdit_5_textChanged(const QString &arg1)
 {
 
-    this->project.events[this->currect_event].name = arg1.toStdString();
-    this->ui->comboBox_3->setItemText(this->currect_event, arg1);
+    this->project.events[this->current_event].name = arg1.toStdString();
+    this->ui->comboBox_3->setItemText(this->current_event, arg1);
 }
 
 void MainWindow::on_action_8_triggered()
@@ -355,8 +353,8 @@ void MainWindow::on_action_8_triggered()
         QMessageBox::Yes|QMessageBox::No
     );
     if (reply == QMessageBox::Yes) {
-        int index_of_event = this->currect_event;
-        this->currect_event = -1;
+        int index_of_event = this->current_event;
+        this->current_event = -1;
         std::vector<CcEvent> cached_events;
         int s = this->project.events.size() - 1;
         for (int i=0; i<(s-index_of_event); i++) {
@@ -387,6 +385,9 @@ void MainWindow::on_action_4_triggered()
 {
     this->update_currect_event();
     Generator generator(this->project);
-    std::cout << generator.get_code() << std::endl;
+    CodeViewDialog code_view_dialog;
+    code_view_dialog.set_code(generator.get_code());
+    code_view_dialog.show();
+    code_view_dialog.exec();
 }
 

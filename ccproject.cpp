@@ -71,7 +71,7 @@ std::vector<CcStoryNode> get_evnet_tree(Json::Value json_tree)
         }
         CcStoryNode node;
         node.type = item["type"].asInt();
-        node.content = item["type"].asString();
+        node.content = item["content"].asString();
         node.children = get_evnet_tree(item["children"]);
         nodes.push_back(node);
     }

@@ -24,6 +24,9 @@ set(PROJECT_SOURCES
         endingdialog.ui
         ccproject.h
         ccproject.cpp
+        codeviewdialog.h
+        codeviewdialog.cpp
+        codeviewdialog.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -48,6 +51,7 @@ else()
             generator.h generator.cpp
             endingdialog.h endingdialog.cpp endingdialog.ui
             ccproject.h ccproject.cpp
+            codeviewdialog.h codeviewdialog.cpp codeviewdialog.ui
         )
     endif()
 endif()

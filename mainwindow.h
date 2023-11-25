@@ -75,7 +75,7 @@ private:
     int get_node_type(QString string_type);
 
     CcProject project;
-    int currect_event;
+    int current_event;
 };
 
 extern const std::vector<QString> NODE_TYPES;
