@@ -36,7 +36,7 @@ jobs:
        copy ../../LICENSE .
 
    - name: Archive production artifacts
-     uses: actions/upload-artifact@v2
+     uses: actions/upload-artifact@v3.1.3
      with:
        name: SCCEX for Windows
        path: |
@@ -45,6 +45,17 @@ jobs:
          ./build/Release/Qt6Gui.dll
          ./build/Release/Qt6Widgets.dll
          ./build/Release/platforms/
+
+   - name: Prepare full version
+     run: |
+       cd build/Release
+       copy ../include/**/*.dll .
+   - name: Upload full version
+     uses: actions/upload-artifact@v3.1.3
+     with:
+       name: SCCEX for Windows (Full)
+       path: |
+        ./build/Release/*
          ./build/Release/styles/
          ./build/Release/jsoncpp.dll
          ./build/Release/fmt.dll
