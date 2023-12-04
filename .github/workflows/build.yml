@@ -34,6 +34,7 @@ jobs:
        copy ../include/jsoncpp/src/lib_json/Release/jsoncpp.dll .
        copy ../include/fmt/bin/Release/fmt.dll .
        copy ../../LICENSE .
+       copy ../../static/* .
 
    - name: Archive production artifacts
      uses: actions/upload-artifact@v3.1.3
@@ -49,6 +50,8 @@ jobs:
          ./build/Release/jsoncpp.dll
          ./build/Release/fmt.dll
          ./build/Release/LICENSE
+         ./build/Release/说明.txt
+         ./build/Release/_vcruntime140_1.dll
 
    - name: Prepare full version
      run: |
