@@ -487,7 +487,7 @@ void MainWindow::check_treeWidget_changes()
     if (item == nullptr) {
         item = selected_item;
     }
-    cout << item->text(0).toStdString() << " " << item->parent() << endl;
+    // cout << item->text(0).toStdString() << " " << item->parent() << endl;
     if (is_valid_node(item)) {
         if (item->parent() == nullptr) {
             this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(item));
