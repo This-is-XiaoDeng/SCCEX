@@ -51,7 +51,7 @@ jobs:
          ./build/Release/fmt.dll
          ./build/Release/LICENSE
          ./build/Release/说明.txt
-         ./build/Release/_vcruntime140_1.dll
+         ./build/Release/vc_redist.x64.exe
 
    - name: Prepare full version
      run: |

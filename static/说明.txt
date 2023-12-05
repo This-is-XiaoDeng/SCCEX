@@ -7,23 +7,14 @@
 1. 将整个压缩包解压到一个空文件夹中
 2. 双击运行 SugarContChatEditor.exe
 
+### 温馨提示
+
+如果提示缺失 `VCRUNTIME140_1.dll` 或其他带有 `VC` 字眼的 `*.dll` 文件，请运行目录下的 `vc_redist.x64.exe` 安装或修复 `Visual C++ Redistributable for Visual Studio 2015` 环境
+
 ### 警告
 
 **目前 SCCEX 在退出或新建项目时不会检查项目是否保存，请在执行这些操作前保存项目**
 
-## 常见问题
-
-### 启动时报错 `系统错误：由于找不到 VCRUNTIME140_1.dll，无法继续执行代码...`
-
-原因：VC++2015 环境未安装或损坏
-
-需要安装或修复 `Visual C++ Redistributable for Visual Studio 2015` 环境
-
-或尝试将程序内的 `_vcruntime140_1.dll` 重命名为 `vcruntime140_1.dll` 
-
-(如果第二种方法失败建议还原其名称或将其删除)
-
-https://www.microsoft.com/zh-CN/download/details.aspx?id=48145
 
 ### 启动时报错 `系统错误：由于找不到 xxxxxxxxx.dll，无法继续执行代码...`
 
