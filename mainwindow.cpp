@@ -5,6 +5,7 @@
 #include "codeviewdialog.h"
 #include <fmt/printf.h>
 #include "generator.h"
+#include <QTimer>
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -473,7 +474,6 @@ void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
 //     }
 //     this->cached_tree_item.item = item;
 // }
-using namespace std;
 
 
 
@@ -489,7 +489,6 @@ void MainWindow::check_treeWidget_changes()
     }
     cout << item->text(0).toStdString() << " " << item->parent() << endl;
     if (is_valid_node(item)) {
-        cout << "114514" << endl;
         if (item->parent() == nullptr) {
             this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(item));
         } else {
