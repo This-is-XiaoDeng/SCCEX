@@ -13,11 +13,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     this->ui->tabWidget->setDisabled(true);
-    this->project_checking_timer = new QTimer(this);
-    this->project_checking_timer->setInterval(3000);
-    QObject::connect(this->project_checking_timer, &QTimer::timeout, this, &MainWindow::check_current_event);
-    this->project_checking_timer->start();
+    this->current_event = -1;
+    this->cached_tree_item.item = nullptr;
+    // this->project_checking_timer = new QTimer(this);
+    // this->project_checking_timer->setInterval(3000);
+    // QObject::connect(this->project_checking_timer, &QTimer::timeout, this, &MainWindow::check_current_event);
+    // this->project_checking_timer->start();
+
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -141,28 +145,21 @@ inline bool MainWindow::is_valid_node(QTreeWidgetItem *item)
            (node_type == 4 && (this->is_end(item->text(1))));
 }
 
-void MainWindow::_check_current_event(QTreeWidgetItem *item)
-{
-    static QBrush default_color = item->foreground(0);
-    const QBrush red(Qt::red);
-    if (this->is_valid_node(item)) {
-        item->setForeground(0, red);
-        item->setForeground(1, red);
-    } else if (item->foreground(0) == red) {
-        item->setForeground(0, default_color);
-        item->setForeground(1, default_color);
-    }
-    for (int i=0; i<item->childCount(); i++) {
-        this->_check_current_event(item->child(i));
-    }
-}
-
-void MainWindow::check_current_event()
-{
-    for (int i=0; i<this->ui->treeWidget->topLevelItemCount(); i++) {
-        this->_check_current_event(this->ui->treeWidget->topLevelItem(i));
-    }
-}
+// void MainWindow::_check_current_event(QTreeWidgetItem *item)
+// {
+//     static QBrush default_color = item->foreground(0);
+//     const QBrush red(Qt::red);
+//     if (this->is_valid_node(item)) {
+//         item->setForeground(0, red);
+//         item->setForeground(1, red);
+//     } else if (item->foreground(0) == red) {
+//         item->setForeground(0, default_color);
+//         item->setForeground(1, default_color);
+//     }
+//     for (int i=0; i<item->childCount(); i++) {
+//         this->_check_current_event(item->child(i));
+//     }
+// }
 
 void MainWindow::on_toolButton_clicked()
 {
@@ -465,5 +462,57 @@ void MainWindow::on_tableWidget_itemChanged(QTableWidgetItem *item)
     }
 }
 
+// void MainWindow::on_treeWidget_itemPressed(QTreeWidgetItem *item, int column)
+// {
+//     std::cout << "nmsl" << std::endl;
+//     this->cached_tree_item.parent = item->parent();
+//     if (this->cached_tree_item.parent == nullptr) {
+//         this->cached_tree_item.index = this->ui->treeWidget->indexOfTopLevelItem(item);
+//     } else {
+//         this->cached_tree_item.index = this->cached_tree_item.parent->indexOfChild(item);
+//     }
+//     this->cached_tree_item.item = item;
+// }
+using namespace std;
 
 
+
+void MainWindow::check_treeWidget_changes()
+{
+    if (this->ui->treeWidget->selectedItems().empty()) {
+        return;
+    }
+    QTreeWidgetItem *item = this->cached_tree_item.item;
+    QTreeWidgetItem *selected_item = this->ui->treeWidget->selectedItems()[0];
+    if (item == nullptr) {
+        item = selected_item;
+    }
+    cout << item->text(0).toStdString() << " " << item->parent() << endl;
+    if (is_valid_node(item)) {
+        cout << "114514" << endl;
+        if (item->parent() == nullptr) {
+            this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(item));
+        } else {
+            item->parent()->takeChild(item->parent()->indexOfChild(item));
+        }
+        if (this->cached_tree_item.parent == nullptr) {
+            this->ui->treeWidget->insertTopLevelItem(this->cached_tree_item.index, item);
+        } else {
+            this->cached_tree_item.parent->insertChild(this->cached_tree_item.index, item);
+        }
+    }
+    this->cached_tree_item.parent = selected_item->parent();
+    if (selected_item->parent() == nullptr) {
+        this->cached_tree_item.index = this->ui->treeWidget->indexOfTopLevelItem(selected_item);
+    } else {
+        this->cached_tree_item.index = selected_item->parent()->indexOfChild(selected_item);
+    }
+    this->cached_tree_item.item = selected_item;
+}
+
+void MainWindow::on_treeWidget_itemSelectionChanged()
+{
+    QTimer::singleShot(100, this, [=]() {
+        this->check_treeWidget_changes();
+    });
+}

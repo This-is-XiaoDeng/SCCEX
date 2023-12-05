@@ -119,7 +119,10 @@
            <enum>QAbstractItemView::InternalMove</enum>
           </property>
           <property name="defaultDropAction">
-           <enum>Qt::IgnoreAction</enum>
+           <enum>Qt::MoveAction</enum>
+          </property>
+          <property name="headerHidden">
+           <bool>false</bool>
           </property>
           <column>
            <property name="text">
@@ -136,7 +139,7 @@
         <item>
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>添加内容</string>
+           <string>添加节点</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="1" column="0" colspan="2">
@@ -221,7 +224,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>操作类型：</string>
+              <string>类型：</string>
              </property>
             </widget>
            </item>
