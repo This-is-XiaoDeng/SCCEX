@@ -11,15 +11,12 @@
 
 如果提示缺失 `VCRUNTIME140_1.dll` 或其他带有 `VC` 字眼的 `*.dll` 文件，请运行目录下的 `vc_redist.x64.exe` 安装或修复 `Visual C++ Redistributable for Visual Studio 2015` 环境
 
-### 警告
+## 警告
 
 **目前 SCCEX 在退出或新建项目时不会检查项目是否保存，请在执行这些操作前保存项目**
 
 
-### 启动时报错 `系统错误：由于找不到 xxxxxxxxx.dll，无法继续执行代码...`
+-------
 
-原因：此应用程序打包出现问题，缺少需要的环境
-
-前往 https://github.com/This-is-XiaoDeng/SCCEX/actions/workflows/build.yml ，使用最新版的 Full 版本（`SCCEX for Windows (Full)`）重试
-
+https://github.com/This-is-XiaoDeng/SCCEX
 
