@@ -39,7 +39,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -343,6 +343,7 @@
      <string>文件</string>
     </property>
     <addaction name="action"/>
+    <addaction name="separator"/>
     <addaction name="action_2"/>
     <addaction name="action_3"/>
     <addaction name="separator"/>
