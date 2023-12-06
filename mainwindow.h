@@ -78,6 +78,8 @@ private slots:
 
     void on_treeWidget_itemSelectionChanged();
 
+    // void on_treeWidget_objectNameChanged(const QString &objectName);
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
@@ -96,6 +98,9 @@ private:
     // void check_current_event();
     inline bool is_valid_node(QTreeWidgetItem *item);
     void check_treeWidget_changes();
+    void on_treeItem_moved(QTreeWidgetItem *item);
+    void undo_item_movement(QTreeWidgetItem *item);
+    void move_item_to_parent_level(QTreeWidgetItem *item);
 
     CcProject project;
     int current_event;

@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->ui->tabWidget->setDisabled(true);
     this->current_event = -1;
     this->cached_tree_item.item = nullptr;
+
     // this->project_checking_timer = new QTimer(this);
     // this->project_checking_timer->setInterval(3000);
     // QObject::connect(this->project_checking_timer, &QTimer::timeout, this, &MainWindow::check_current_event);
@@ -487,19 +488,19 @@ void MainWindow::check_treeWidget_changes()
     if (item == nullptr) {
         item = selected_item;
     }
-    // cout << item->text(0).toStdString() << " " << item->parent() << endl;
-    if (is_valid_node(item)) {
-        if (item->parent() == nullptr) {
-            this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(item));
-        } else {
-            item->parent()->takeChild(item->parent()->indexOfChild(item));
-        }
-        if (this->cached_tree_item.parent == nullptr) {
-            this->ui->treeWidget->insertTopLevelItem(this->cached_tree_item.index, item);
-        } else {
-            this->cached_tree_item.parent->insertChild(this->cached_tree_item.index, item);
-        }
-    }
+    // if (is_valid_node(item)) {
+    //     if (item->parent() == nullptr) {
+    //         this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(item));
+    //     } else {
+    //         item->parent()->takeChild(item->parent()->indexOfChild(item));
+    //     }
+    //     if (this->cached_tree_item.parent == nullptr) {
+    //         this->ui->treeWidget->insertTopLevelItem(this->cached_tree_item.index, item);
+    //     } else {
+    //         this->cached_tree_item.parent->insertChild(this->cached_tree_item.index, item);
+    //     }
+    // }
+    this->on_treeItem_moved(item);
     this->cached_tree_item.parent = selected_item->parent();
     if (selected_item->parent() == nullptr) {
         this->cached_tree_item.index = this->ui->treeWidget->indexOfTopLevelItem(selected_item);
@@ -507,6 +508,50 @@ void MainWindow::check_treeWidget_changes()
         this->cached_tree_item.index = selected_item->parent()->indexOfChild(selected_item);
     }
     this->cached_tree_item.item = selected_item;
+}
+
+void MainWindow::undo_item_movement(QTreeWidgetItem *item)
+{
+    if (item->parent() == nullptr) {
+        this->ui->treeWidget->takeTopLevelItem(this->ui->treeWidget->indexOfTopLevelItem(item));
+    } else {
+        item->parent()->takeChild(item->parent()->indexOfChild(item));
+    }
+    if (this->cached_tree_item.parent == nullptr) {
+        this->ui->treeWidget->insertTopLevelItem(this->cached_tree_item.index, item);
+    } else {
+        this->cached_tree_item.parent->insertChild(this->cached_tree_item.index, item);
+    }
+}
+
+void MainWindow::move_item_to_parent_level(QTreeWidgetItem *item) {
+    if (item->parent() == nullptr) {
+        return;
+    }
+    QTreeWidgetItem *ancestor = item->parent()->parent();
+    item->parent()->takeChild(item->parent()->indexOfChild(item));
+    if (ancestor != nullptr) {
+        const int index = ancestor->indexOfChild(item->parent());
+        ancestor->insertChild(index + 1, item);
+    } else {
+        const int index = this->ui->treeWidget->indexOfTopLevelItem(item->parent());
+        this->ui->treeWidget->insertTopLevelItem(index + 1, item);
+    }
+
+}
+
+void MainWindow::on_treeItem_moved(QTreeWidgetItem *item)
+{
+    const int node_type = get_node_type(item->text(0));
+    int parent_type = -1;
+    if (item->parent() != nullptr) {
+       parent_type = get_node_type(item->parent()->text(0));
+    }
+    if (node_type == 1 && parent_type != 0) {
+        this->undo_item_movement(item);
+    } else if (node_type != 1 && (parent_type != 1 || parent_type != 3)) {
+        this->move_item_to_parent_level(item);
+    }
 }
 
 void MainWindow::on_treeWidget_itemSelectionChanged()
