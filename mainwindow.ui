@@ -355,8 +355,6 @@
     <property name="title">
      <string>事件</string>
     </property>
-    <addaction name="action_6"/>
-    <addaction name="separator"/>
     <addaction name="action_8"/>
    </widget>
    <addaction name="menu"/>
@@ -378,11 +376,6 @@
   <action name="action_3">
    <property name="text">
     <string>新建</string>
-   </property>
-  </action>
-  <action name="action_6">
-   <property name="text">
-    <string>测试</string>
    </property>
   </action>
   <action name="action_8">
