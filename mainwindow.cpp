@@ -560,3 +560,9 @@ void MainWindow::on_treeWidget_itemSelectionChanged()
         this->check_treeWidget_changes();
     });
 }
+
+void MainWindow::on_toolButton_4_clicked()
+{
+    this->ui->tabWidget->setCurrentIndex(2);
+}
+

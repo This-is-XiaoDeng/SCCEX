@@ -52,6 +52,7 @@ else()
             endingdialog.h endingdialog.cpp endingdialog.ui
             ccproject.h ccproject.cpp
             codeviewdialog.h codeviewdialog.cpp codeviewdialog.ui
+
         )
     endif()
 endif()

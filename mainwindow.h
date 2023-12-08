@@ -80,6 +80,10 @@ private slots:
 
     // void on_treeWidget_objectNameChanged(const QString &objectName);
 
+    void on_toolButton_4_clicked();
+
+    // void on_action_6_triggered();
+
 private:
     Ui::MainWindow *ui;
     void clear_insert_inputs();
