@@ -549,7 +549,7 @@ void MainWindow::on_treeItem_moved(QTreeWidgetItem *item)
     }
     if (node_type == 1 && parent_type != 0) {
         this->undo_item_movement(item);
-    } else if (node_type != 1 && (parent_type != 1 || parent_type != 3)) {
+    } else if (node_type != 1 && (parent_type != 1 && parent_type != 3)) {
         this->move_item_to_parent_level(item);
     }
 }
