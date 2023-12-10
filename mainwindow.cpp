@@ -237,6 +237,7 @@ void MainWindow::on_action_2_triggered()
     }
     OperationResult result = this->project.save_project();
     if (!result.is_success) {
+        this->project.file = "";
         if (QMessageBox::critical(this, "错误 - SCCEX", QString::fromStdString(result.error)) == QMessageBox::Retry) {
             return this->on_action_2_triggered();
         }
@@ -255,6 +256,7 @@ void MainWindow::on_action_triggered()
     OperationResult result = this->project.load_project();
     if (!result.is_success) {
         if (QMessageBox::critical(this, "错误 - SCCEX", QString::fromStdString(result.error)) == QMessageBox::Retry) {
+            this->project.file = "";
             return this->on_action_triggered();
         }
     }
