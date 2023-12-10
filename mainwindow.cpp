@@ -235,6 +235,7 @@ void MainWindow::on_action_2_triggered()
         }
         this->project.file = file_path.toStdString();
     }
+    this->update_currect_event();
     OperationResult result = this->project.save_project();
     if (!result.is_success) {
         this->project.file = "";
