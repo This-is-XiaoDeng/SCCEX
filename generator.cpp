@@ -105,7 +105,7 @@ std::string get_message_choices(std::vector<CcStoryNode> nodes)
 void Generator::parse_message_node(CcStoryNode node)
 {
     this->code.append(fmt::format(
-        "yield event.PushMsg(r'''{}'''{})",
+        "yield event.PushMsg(r'''{}''',{})",
         node.content,
         get_message_choices(node.children)
     ));
@@ -162,7 +162,7 @@ std::string get_ends_string(CcEvent event)
     std::string ends_string;
     for (const End &end : event.ends) {
         ends_string.append(fmt::format(
-            "CcEnd(r'''{}''', r'''{}''')",
+            "CcEnd(r'''{}''', r'''{}'''),",
             end.id,
             end.description
         ));
