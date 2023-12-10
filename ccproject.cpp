@@ -9,7 +9,7 @@ OperationResult CcProject::load_project()
     std::ifstream file(this->file);
     if (!file.is_open()) {
         result.is_success = false;
-        result.error = "打开文件失败：可能是因为文件不存在或权限不足";
+        result.error = "打开文件失败：可能是因为路径不存在或权限不足\n提示: 暂不支持打开含中文路径";
         return result;
     }
 
@@ -109,7 +109,7 @@ OperationResult CcProject::save_project()
     std::ofstream file(this->file);
     if (!file.is_open()) {
         result.is_success = false;
-        result.error = "打开文件失败：可能是因为文件不存在或权限不足";
+        result.error = "打开文件失败：可能是因为路径不存在或权限不足\n提示: 暂不支持打开含中文路径";
         return result;
     }
     file << this->parse_events2json().toStyledString();
